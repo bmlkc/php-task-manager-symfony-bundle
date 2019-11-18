@@ -62,7 +62,6 @@ class PhpTaskManagerExtension extends Extension
         if (isset($config['pool']['max_jobs_per_process'])) {
             $configDefinition->addMethodCall('setMaxJobsPerProcess', [$config['pool']['max_jobs_per_process']]);
         }
-
     }
     
 }

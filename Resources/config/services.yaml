@@ -28,6 +28,10 @@ services:
 
     SunValley\TaskManager\Client:
         arguments: ['@SunValley\TaskManager\TaskQueueInterface']
+        public: false
+
+    php_task_manager_client:
+        alias: SunValley\TaskManager\Client
         public: true
 
     SunValley\TaskManager\Symfony\Command\TaskManagerCommand:

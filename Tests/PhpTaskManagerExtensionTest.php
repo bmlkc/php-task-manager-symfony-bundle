@@ -6,10 +6,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use SunValley\TaskManager\Client;
 use SunValley\TaskManager\ProgressReporter;
-use SunValley\TaskManager\Symfony\DependencyInjection\PhpTaskManagerExtension;
 use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleTask;
 use SunValley\TaskManager\TaskStorage\RedisTaskStorage;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
 class PhpTaskManagerExtensionTest extends TestCase
@@ -18,7 +16,7 @@ class PhpTaskManagerExtensionTest extends TestCase
     public function testBasicConfig()
     {
         $container = $this->buildContainer($this->getEmptyConfig());
-        $client    = $container->get(Client::class);
+        $client    = $container->get('php_task_manager_client');
         $this->assertInstanceOf(Client::class, $client);
 
         $configuration = $container->get('SunValley\TaskManager\Configuration');
