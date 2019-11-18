@@ -1,2 +1,36 @@
 services:
-    
+    php_task_manager_loop:
+        public: false
+        class: React\EventLoop\LoopInterface
+        factory: ['React\EventLoop\Factory', create]
+
+    php_task_manager_storage:
+        lazy: true
+        public: true
+
+    SunValley\TaskManager\Symfony\Task\TaskEnvironment:
+        arguments: ['@service_container']
+
+    SunValley\TaskManager\Symfony\Task\TaskManagerFactory:
+        public: false
+        arguments: ['@php_task_manager_loop', '@SunValley\TaskManager\TaskQueueInterface', '@SunValley\TaskManager\Configuration', '@SunValley\TaskManager\Symfony\Task\TaskEnvironment', '@?SunValley\TaskManager\TaskStorageInterface']
+
+    php_task_manager_factory:
+        public: true
+        alias: SunValley\TaskManager\Symfony\Task\TaskManagerFactory
+
+    SunValley\TaskManager\Configuration:
+        public: false
+
+    SunValley\TaskManager\TaskQueueInterface:
+        lazy: true
+        public: false
+
+    SunValley\TaskManager\Client:
+        arguments: ['@SunValley\TaskManager\TaskQueueInterface']
+        public: true
+
+    SunValley\TaskManager\Symfony\Command\TaskManagerCommand:
+        arguments: ['@SunValley\TaskManager\Symfony\Task\TaskManagerFactory']
+        tags:
+            - { name: console.command }
