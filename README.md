@@ -4,6 +4,12 @@
 
 This bundle integrates the task manager to Symfony. Supports Symfony ^3.4.26 and ^4.1.12.
 
+## Installing
+
+``
+composer require sunvalley-technologies/php-task-manager-symfony-bundle
+``
+
 ## Configuration
 
 Complete configuration looks like following:
