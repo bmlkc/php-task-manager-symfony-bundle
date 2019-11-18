@@ -90,16 +90,16 @@ class PhpTaskManagerExtensionTest extends TestCase
 
     public function testTaskEval()
     {
-        $config = $this->getFullConfig();
+        $config    = $this->getFullConfig();
         $container = $this->buildContainer($config);
         $factory   = $container->get('php_task_manager_factory');
         $loop      = $factory->getLoop();
         $manager   = $factory->generate();
         $uniqid    = uniqid();
         putenv('PTM_TEST_KERNEL_CONFIG=' . base64_encode(serialize(['php_task_manager' => $config])));
-        $promise   = $manager->submitTask(new SampleTask($uniqid, ['data' => '543']));
-        $result    = null;
-        $error     = null;
+        $promise = $manager->submitTask(new SampleTask($uniqid, ['data' => '543']));
+        $result  = null;
+        $error   = null;
         $promise->then(
             function (ProgressReporter $reporter) use ($loop, &$result, &$error) {
                 $result = $reporter->getResult();
@@ -112,12 +112,12 @@ class PhpTaskManagerExtensionTest extends TestCase
             }
         );
         //timeout
-        /*        $loop->addTimer(
-                    5,
-                    function () use ($loop) {
-                        $loop->stop();
-                    }
-                );*/
+        $loop->addTimer(
+            5,
+            function () use ($loop) {
+                $loop->stop();
+            }
+        );
         $loop->run();
 
         $this->assertEmpty($error);

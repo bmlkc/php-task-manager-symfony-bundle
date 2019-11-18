@@ -33,8 +33,22 @@ class TaskEnvironment
         $kernel = $this->container->get('kernel');
 
         putenv('PTM_SB_KERNEL_CLASS=' . get_class($kernel));
-        putenv('PTM_SB_KERNEL_ENV=' . $kernel->getEnvironment());
-        putenv('PTM_SB_KERNEL_DEBUG=' . $kernel->isDebug());
+        putenv('PTM_SB_KERNEL_ARGS=' . base64_encode(json_encode($this->getKernelArguments())));
+    }
+
+    /**
+     * Returns arguments passed to the Kernel
+     *
+     * @return array
+     */
+    protected function getKernelArguments(): array
+    {
+        $kernel = $this->container->get('kernel');
+
+        return [
+            $kernel->getEnvironment(),
+            $kernel->isDebug(),
+        ];
     }
 
     /**
@@ -53,12 +67,16 @@ class TaskEnvironment
             throw new \RuntimeException('Given class is not a Symfony Kernel class');
         }
 
-        $kernelDebug = $_ENV['PTM_SB_KERNEL_DEBUG'] ?? $_SERVER['PTM_SB_KERNEL_DEBUG'];
-        $kernelEnv   = $_ENV['PTM_SB_KERNEL_ENV'] ?? $_SERVER['PTM_SB_KERNEL_ENV'];
-        if (!isset($kernelDebug) || !isset($kernelEnv)) {
+        $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS'];
+        $kernelArgs = json_decode(base64_decode($kernelArgs), true);
+        if (empty($kernelArgs)) {
             throw new \RuntimeException('Unable to find required environmental variables');
         }
 
-        return new $kernelClass($kernelEnv, $kernelDebug);
+        $r      = new \ReflectionClass($kernelClass);
+        /** @var Kernel $kernel */
+        $kernel = $r->newInstanceArgs($kernelArgs);
+        
+        return $kernel;
     }
 }
