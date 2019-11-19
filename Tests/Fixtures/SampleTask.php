@@ -12,10 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SampleTask extends AbstractSymfonyTask
 {
 
-    protected function __run(ProgressReporter $reporter, ContainerInterface $container): void
+    protected function __run(ProgressReporter $reporter, ContainerInterface $container)
     {
         $options = $this->getOptions();
-        $reporter->finishTask('Result: ' . $options['data']);
+        
+        return 'Result: ' . $options['data'];
     }
 
     function buildOptionsResolver(): OptionsResolver

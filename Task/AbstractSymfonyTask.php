@@ -21,9 +21,12 @@ abstract class AbstractSymfonyTask extends AbstractTask
         
         $kernel = TaskEnvironment::generateKernelFromEnv();
         $kernel->boot();
-        $this->__run($progressReporter, $kernel->getContainer());
+        $result = $this->__run($progressReporter, $kernel->getContainer());
+        if (!$progressReporter->isCompleted() && !$progressReporter->isFailed()) {
+            $progressReporter->finishTask($result);
+        }
+        
         $kernel->shutdown();
-
     }
 
     /**
@@ -31,8 +34,10 @@ abstract class AbstractSymfonyTask extends AbstractTask
      *
      * @param ProgressReporter   $reporter
      * @param ContainerInterface $container
+     *                                     
+     * @return mixed The return value will be set as result to this task
      */
-    abstract protected function __run(ProgressReporter $reporter, ContainerInterface $container): void;
+    abstract protected function __run(ProgressReporter $reporter, ContainerInterface $container);
 
 
 }

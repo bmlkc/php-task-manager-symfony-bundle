@@ -49,7 +49,7 @@ class ExampleTask extends \SunValley\TaskManager\Symfony\Task\AbstractSymfonyTas
     
 
 
-    protected function __run(\SunValley\TaskManager\ProgressReporter $reporter,\Symfony\Component\DependencyInjection\ContainerInterface $container) : void{
+    protected function __run(\SunValley\TaskManager\ProgressReporter $reporter,\Symfony\Component\DependencyInjection\ContainerInterface $container){
         $data = $this->getOptions()['data'];
         $entityManager = $container->get('entity_manager');
         $entity = $entityManager->find('\Some\Entity');
@@ -57,7 +57,7 @@ class ExampleTask extends \SunValley\TaskManager\Symfony\Task\AbstractSymfonyTas
         $entityManager->persist($entity);
         $entityManager->flush();
 
-        $reporter->finishTask();
+        return 'Task Completed'; // will be passed as $result to $reporter->finishTask($result) if it is not called or failed before 
     }
 
     public function buildOptionsResolver() : \Symfony\Component\OptionsResolver\OptionsResolver{
@@ -93,7 +93,7 @@ class MyAsyncService {
 
 ````
 
-The call to `finishTask` or `failTask` is mandatory. Any exception that is thrown however is caught and reported back with `failTask($error)`.
+The call to `finishTask` or `failTask` is optional unlike on plain task manager tasks. Any exception that is thrown however is caught and reported back with `failTask($error)`.
 
 To submit a task, the task should be constructed and then it can be submitted with the client as on the example service above.
 
