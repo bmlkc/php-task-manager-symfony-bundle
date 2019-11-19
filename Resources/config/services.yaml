@@ -13,7 +13,7 @@ services:
 
     SunValley\TaskManager\Symfony\Task\TaskManagerFactory:
         public: false
-        arguments: ['@php_task_manager_loop', '@SunValley\TaskManager\TaskQueueInterface', '@SunValley\TaskManager\Configuration', '@SunValley\TaskManager\Symfony\Task\TaskEnvironment', '@?SunValley\TaskManager\TaskStorageInterface']
+        arguments: ['@php_task_manager_loop', '@SunValley\TaskManager\TaskQueueInterface', '@SunValley\TaskManager\Configuration', '@SunValley\TaskManager\Symfony\Task\TaskEnvironment', '@?php_task_manager_storage']
 
     php_task_manager_factory:
         public: true
@@ -27,7 +27,7 @@ services:
         public: false
 
     SunValley\TaskManager\Client:
-        arguments: ['@SunValley\TaskManager\TaskQueueInterface']
+        arguments: ['@SunValley\TaskManager\TaskQueueInterface', '@?php_task_manager_storage']
         public: false
 
     php_task_manager_client:
