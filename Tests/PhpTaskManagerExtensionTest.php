@@ -120,7 +120,7 @@ class PhpTaskManagerExtensionTest extends TestCase
         );
         $loop->run();
 
-        $this->assertEmpty($error);
+        $this->assertEmpty($error, $error);
         $this->assertEquals('Result: 543', $result);
         putenv('PTM_TEST_KERNEL_CONFIG=');
     }

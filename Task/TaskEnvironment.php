@@ -67,9 +67,9 @@ class TaskEnvironment
             throw new \RuntimeException('Given class is not a Symfony Kernel class');
         }
 
-        $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS'];
-        $kernelArgs = unserialize(base64_decode($kernelArgs), true);
-        if (empty($kernelArgs)) {
+        $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS']?? null;
+        $kernelArgs = unserialize(base64_decode($kernelArgs));
+        if ($kernelArgs === null) {
             throw new \RuntimeException('Unable to find required environmental variables');
         }
 
