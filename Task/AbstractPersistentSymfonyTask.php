@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\Kernel;
  * Class AbstractPersistentSymfonyTask defines a task that can be used with the framework.
  *
  * This task creates a kernel for the first time a task is received. It never shutdowns the kernel. The kernel is also
- * accessible from protected $kernel variable.
+ * accessible from protected static $kernel variable.
  *
  * @package SunValley\TaskManager\Symfony\Task
  */
@@ -20,15 +20,15 @@ abstract class AbstractPersistentSymfonyTask
 {
 
     /** @var Kernel */
-    protected $kernel;
+    protected static $kernel;
 
     /** @inheritDoc */
     final public function run(ProgressReporter $progressReporter): void
     {
-        if ($this->kernel === null) {
-            $this->kernel = $kernel = TaskEnvironment::generateKernelFromEnv();
+        if (static::$kernel === null) {
+            static::$kernel = $kernel = TaskEnvironment::generateKernelFromEnv();
         } else {
-            $kernel = $this->kernel;
+            $kernel = static::$kernel;
         }
 
         $kernel->boot();
