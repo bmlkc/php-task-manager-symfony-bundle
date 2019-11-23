@@ -109,3 +109,9 @@ Task manager uses the loop `php_task_manager_loop` defined in its configuration 
 
 Many of these can be changed with a compiler pass in case a customization is necessary. 
 
+## Other Topics
+
+### Doctrine Entity Repository Task
+
+`\SunValley\TaskManager\Symfony\Doctrine\EntityRepositoryTask` task can be used to offload synchronous doctrine calls to background for async apps.
+This task does not make sense for usual work queues but can be useful for async apps that partially depend on doctrine for ORM access. 
