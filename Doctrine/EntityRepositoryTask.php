@@ -102,8 +102,10 @@ class EntityRepositoryTask extends BaseTask
         }
 
         if ($fresh && $result) {
-            if (is_array($result)) {
-                array_map([$manager, 'refresh'], $result);
+            if (is_iterable($result)) {
+                foreach ($result as $item) {
+                    $manager->refresh($item);
+                }
             } else {
                 $manager->refresh($result);
             }
