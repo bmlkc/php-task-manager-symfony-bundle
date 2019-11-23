@@ -33,7 +33,7 @@ class TaskEnvironment
         $kernel = $this->container->get('kernel');
 
         putenv('PTM_SB_KERNEL_CLASS=' . get_class($kernel));
-        putenv('PTM_SB_KERNEL_ARGS=' . base64_encode(json_encode($this->getKernelArguments())));
+        putenv('PTM_SB_KERNEL_ARGS=' . base64_encode(serialize($this->getKernelArguments())));
     }
 
     /**
@@ -68,7 +68,7 @@ class TaskEnvironment
         }
 
         $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS'];
-        $kernelArgs = json_decode(base64_decode($kernelArgs), true);
+        $kernelArgs = unserialize(base64_decode($kernelArgs), true);
         if (empty($kernelArgs)) {
             throw new \RuntimeException('Unable to find required environmental variables');
         }
