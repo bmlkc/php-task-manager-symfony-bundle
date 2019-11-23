@@ -5,6 +5,7 @@ namespace SunValley\TaskManager\Symfony\Task;
 
 
 use SunValley\TaskManager\ProgressReporter;
+use SunValley\TaskManager\Task\AbstractTask;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -16,7 +17,7 @@ use Symfony\Component\HttpKernel\Kernel;
  *
  * @package SunValley\TaskManager\Symfony\Task
  */
-abstract class AbstractPersistentSymfonyTask
+abstract class AbstractPersistentSymfonyTask extends AbstractTask
 {
 
     /** @var Kernel */
