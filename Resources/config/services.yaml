@@ -9,6 +9,7 @@ services:
         public: true
 
     SunValley\TaskManager\Symfony\Task\TaskEnvironment:
+        public: false
         arguments: ['@service_container']
 
     SunValley\TaskManager\Symfony\Task\TaskManagerFactory:

@@ -33,14 +33,14 @@ class TaskManagerFactory
     /** @var TaskManager */
     protected $cachedManager;
 
-    /** @var TaskEnvironment */
+    /** @var TaskEnvironmentInterface */
     protected $environment;
 
     public function __construct(
         LoopInterface $loop,
         TaskQueueInterface $queue,
         Configuration $configuration,
-        TaskEnvironment $environment,
+        TaskEnvironmentInterface $environment,
         ?TaskStorageInterface $storage = null
     ) {
         $this->loop          = $loop;

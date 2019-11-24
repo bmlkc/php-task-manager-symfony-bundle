@@ -7,7 +7,7 @@ namespace SunValley\TaskManager\Symfony\Task;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
-class TaskEnvironment
+class TaskEnvironment implements TaskEnvironmentInterface
 {
 
     /**
@@ -25,9 +25,7 @@ class TaskEnvironment
         $this->container = $container;
     }
 
-    /**
-     * Registers environmental variables to pass required Kernel parameters to child
-     */
+    /** @inheritDoc */
     public function register()
     {
         $kernel = $this->container->get('kernel');
