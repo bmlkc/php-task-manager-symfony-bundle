@@ -125,7 +125,7 @@ class EntityRepositoryTask extends BaseTask
         $resolver->setRequired('entity');
         $resolver->setAllowedTypes('entity', 'string');
         // Entity manager service that the container will be asked
-        $resolver->setDefault('entity_manager_service', 'entity_manager');
+        $resolver->setDefault('entity_manager_service', 'doctrine.orm.entity_manager');
         $resolver->setAllowedTypes('entity_manager_service', 'string');
         // Method call to entity repository
         $resolver->setRequired('method');
