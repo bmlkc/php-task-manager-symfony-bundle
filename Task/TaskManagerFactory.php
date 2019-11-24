@@ -3,7 +3,6 @@
 namespace SunValley\TaskManager\Symfony\Task;
 
 use React\EventLoop\LoopInterface;
-use SunValley\TaskManager\Configuration;
 use SunValley\TaskManager\Configuration as PoolConfiguration;
 use SunValley\TaskManager\TaskManager;
 use SunValley\TaskManager\TaskQueueInterface;
@@ -24,10 +23,10 @@ class TaskManagerFactory
     /** @var TaskQueueInterface */
     protected $queue;
 
-    /** @var PoolConfiguration */
+    /** @var PoolConfiguration|null */
     protected $configuration;
 
-    /** @var TaskStorageInterface */
+    /** @var TaskStorageInterface|null */
     protected $storage;
 
     /** @var TaskManager */
@@ -39,8 +38,8 @@ class TaskManagerFactory
     public function __construct(
         LoopInterface $loop,
         TaskQueueInterface $queue,
-        Configuration $configuration,
         TaskEnvironmentInterface $environment,
+        ?PoolConfiguration $configuration = null,
         ?TaskStorageInterface $storage = null
     ) {
         $this->loop          = $loop;
@@ -53,17 +52,28 @@ class TaskManagerFactory
     /**
      * If required creates the task manager and returns it.
      *
+     * @param PoolConfiguration|null $configuration Providing a configuration will create a fresh manager. Generated
+     *                                              manager this way is not cached by this factory.
+     *
      * @return TaskManager
      */
-    public function generate(): TaskManager
+    public function generate(?PoolConfiguration $configuration = null): TaskManager
     {
-        if ($this->cachedManager !== null) {
+        if ($configuration === null && $this->cachedManager !== null) {
             return $this->cachedManager;
         }
 
         $this->environment->register();
 
-        return $this->cachedManager = new TaskManager($this->loop, $this->queue, $this->configuration, $this->storage);
+        $taskManager = new TaskManager(
+            $this->loop, $this->queue, $configuration ?? $this->configuration, $this->storage
+        );
+
+        if ($configuration !== null) {
+            return $taskManager;
+        }
+
+        return $this->cachedManager = $taskManager;
     }
 
     /** @return LoopInterface */
