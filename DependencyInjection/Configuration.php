@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    protected function buildUrlConfiguration(ArrayNodeDefinition $node)
+    public function buildUrlConfiguration(ArrayNodeDefinition $node)
     {
         // @formatter:off
         $node->children()
@@ -68,7 +68,7 @@ class Configuration implements ConfigurationInterface
         );
     }
 
-    protected function buildPoolConfiguration(ArrayNodeDefinition $node)
+    public function buildPoolConfiguration(ArrayNodeDefinition $node)
     {
         // @formatter:off
         $node->children()
