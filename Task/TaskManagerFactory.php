@@ -65,6 +65,10 @@ class TaskManagerFactory
 
         $this->environment->register();
 
+        if ($configuration === null && $this->configuration === null) {
+            throw new \RuntimeException('A configuration should be provided if no default configuration exists!');
+        }
+
         $taskManager = new TaskManager(
             $this->loop, $this->queue, $configuration ?? $this->configuration, $this->storage
         );
