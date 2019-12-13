@@ -20,7 +20,8 @@ abstract class AbstractSymfonyTask extends AbstractTask
     {
 
         if ($this->isPersistentTask()) {
-            $kernel = self::getPersistentKernel();
+            /** @noinspection PhpUndefinedMethodInspection */
+            $kernel = self::getPersistentKernel(); // this method is supposed to be provided by PersistentTaskTrait
         } else {
             $kernel = TaskEnvironment::generateKernelFromEnv();
         }
@@ -33,31 +34,13 @@ abstract class AbstractSymfonyTask extends AbstractTask
         }
 
         $kernel->shutdown();
-
     }
 
     abstract protected function runWithInitializedKernel(ProgressReporter $progressReporter, Kernel $kernel);
 
     final private function isPersistentTask(): bool
     {
-        return property_exists(static::class, 'kernel');
-    }
-
-    /**
-     * @return Kernel
-     */
-    final private static function getPersistentKernel(): Kernel
-    {
-        /** @noinspection PhpUndefinedFieldInspection */
-        if (static::$kernel === null) {
-            /** @noinspection PhpUndefinedFieldInspection */
-            static::$kernel = $kernel = TaskEnvironment::generateKernelFromEnv();
-        } else {
-            /** @noinspection PhpUndefinedFieldInspection */
-            $kernel = static::$kernel;
-        }
-
-        return $kernel;
+        return method_exists(static::class, 'getPersistentKernel');
     }
 
 

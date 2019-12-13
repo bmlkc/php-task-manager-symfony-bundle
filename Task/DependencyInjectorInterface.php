@@ -6,5 +6,5 @@ namespace SunValley\TaskManager\Symfony\Task;
 
 interface DependencyInjectorInterface
 {
-    public function injectDependencies(AbstractSymfonyTask $task);
+    public function injectDependencies(AbstractSymfonyDITask $task);
 }
