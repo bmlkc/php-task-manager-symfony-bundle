@@ -4,7 +4,7 @@ namespace SunValley\TaskManager\Symfony\Task;
 
 use SunValley\TaskManager\ProgressReporter;
 use SunValley\TaskManager\Task\AbstractTask;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class AbstractSymfonyTask defines a task that can be used with the framework. This task creates a Kernel each time a
@@ -18,26 +18,47 @@ abstract class AbstractSymfonyTask extends AbstractTask
     /** @inheritDoc */
     final public function run(ProgressReporter $progressReporter): void
     {
-        
-        $kernel = TaskEnvironment::generateKernelFromEnv();
+
+        if ($this->isPersistentTask()) {
+            $kernel = self::getPersistentKernel();
+        } else {
+            $kernel = TaskEnvironment::generateKernelFromEnv();
+        }
+
         $kernel->boot();
-        $result = $this->__run($progressReporter, $kernel->getContainer());
+        $result = $this->runWithInitializedKernel($progressReporter, $kernel);
+
         if (!$progressReporter->isCompleted() && !$progressReporter->isFailed()) {
             $progressReporter->finishTask($result);
         }
-        
+
         $kernel->shutdown();
+
+    }
+
+    abstract protected function runWithInitializedKernel(ProgressReporter $progressReporter, Kernel $kernel);
+
+    final private function isPersistentTask(): bool
+    {
+        return property_exists(static::class, 'kernel');
     }
 
     /**
-     * This method should not store anything from container to somewhere else to avoid memory leaks.
-     *
-     * @param ProgressReporter   $reporter
-     * @param ContainerInterface $container
-     *                                     
-     * @return mixed The return value will be set as result to this task
+     * @return Kernel
      */
-    abstract protected function __run(ProgressReporter $reporter, ContainerInterface $container);
+    final private static function getPersistentKernel(): Kernel
+    {
+        /** @noinspection PhpUndefinedFieldInspection */
+        if (static::$kernel === null) {
+            /** @noinspection PhpUndefinedFieldInspection */
+            static::$kernel = $kernel = TaskEnvironment::generateKernelFromEnv();
+        } else {
+            /** @noinspection PhpUndefinedFieldInspection */
+            $kernel = static::$kernel;
+        }
+
+        return $kernel;
+    }
 
 
 }

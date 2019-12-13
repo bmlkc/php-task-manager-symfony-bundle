@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use SunValley\TaskManager\Client;
 use SunValley\TaskManager\ProgressReporter;
-use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleTask;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleContainerAwareTask;
 use SunValley\TaskManager\TaskStorage\RedisTaskStorage;
 use Symfony\Component\Yaml\Parser;
 
@@ -97,7 +97,7 @@ class PhpTaskManagerExtensionTest extends TestCase
         $manager   = $factory->generate();
         $uniqid    = uniqid();
         putenv('PTM_TEST_KERNEL_CONFIG=' . base64_encode(serialize(['php_task_manager' => $config])));
-        $promise = $manager->submitTask(new SampleTask($uniqid, ['data' => '543']));
+        $promise = $manager->submitTask(new SampleContainerAwareTask($uniqid, ['data' => '543']));
         $result  = null;
         $error   = null;
         $promise->then(
