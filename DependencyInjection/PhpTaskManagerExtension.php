@@ -7,7 +7,9 @@ use SunValley\TaskManager\TaskStorage\RedisTaskStorage;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class PhpTaskManagerExtension extends Extension
@@ -22,13 +24,14 @@ class PhpTaskManagerExtension extends Extension
         $loader        = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yaml');
 
-        $loopDefinition    = $container->getDefinition('php_task_manager_loop');
+        $loopRef           = new Reference('php_task_manager_loop');
         $storageDefinition = $container->getDefinition('php_task_manager_storage');
+        $storageRef        = new Reference('php_task_manager_storage', ContainerInterface::NULL_ON_INVALID_REFERENCE);
         if (!empty($config['task_storage'])) {
             $storageProtocol = parse_url($config['task_storage'], PHP_URL_SCHEME);
             if (stripos($storageProtocol, 'redis') === 0) {
                 $storageDefinition->setClass(RedisTaskStorage::class);
-                $storageDefinition->setArguments([$loopDefinition, $config['task_storage']]);
+                $storageDefinition->setArguments([$loopRef, $config['task_storage']]);
             } else {
                 throw new \RuntimeException(sprintf('Storage protocol %s is not supported', $storageProtocol));
             }
@@ -41,7 +44,7 @@ class PhpTaskManagerExtension extends Extension
         if (stripos($queueProtocol, 'redis') === 0) {
             $queueDefinition = $container->getDefinition('SunValley\TaskManager\TaskQueueInterface');
             $queueDefinition->setClass(RedisTaskQueue::class);
-            $queueDefinition->setArguments([$config['task_queue'], $loopDefinition, $storageDefinition]);
+            $queueDefinition->setArguments([$config['task_queue'], $loopRef, $storageRef]);
         } else {
             throw new \RuntimeException(sprintf('Queue protocol %s is not supported', $queueProtocol));
         }
@@ -63,5 +66,5 @@ class PhpTaskManagerExtension extends Extension
             $configDefinition->addMethodCall('setMaxJobsPerProcess', [$config['pool']['max_jobs_per_process']]);
         }
     }
-    
+
 }
