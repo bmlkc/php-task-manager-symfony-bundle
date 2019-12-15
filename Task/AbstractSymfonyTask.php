@@ -7,8 +7,16 @@ use SunValley\TaskManager\Task\AbstractTask;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class AbstractSymfonyTask defines a task that can be used with the framework. This task creates a Kernel each time a
- * task is run and destroys it at the end of the task.
+ * Class AbstractSymfonyTask defines a task that can be used with the framework.
+ *
+ * Depending on whether this task is "persistent" or not, this task might:
+ *
+ * 1) create a Kernel each time a task is run and destroy it at the end of this
+ *    particular task execution (non-persistent task).
+ * 2) create a kernel and never shut it down
+ *    in order to reuse it later (persistent task)
+ *
+ * a task class becomes "persistent" by using PersistentTaskTrait
  *
  * @package SunValley\TaskManager\Symfony\Task
  */
@@ -27,13 +35,16 @@ abstract class AbstractSymfonyTask extends AbstractTask
         }
 
         $kernel->boot();
+
         $result = $this->runWithInitializedKernel($progressReporter, $kernel);
 
         if (!$progressReporter->isCompleted() && !$progressReporter->isFailed()) {
             $progressReporter->finishTask($result);
         }
 
-        $kernel->shutdown();
+        if (!$this->isPersistentTask()) {
+            $kernel->shutdown();
+        }
     }
 
     abstract protected function runWithInitializedKernel(ProgressReporter $progressReporter, Kernel $kernel);
