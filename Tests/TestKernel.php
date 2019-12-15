@@ -4,6 +4,7 @@
 namespace SunValley\TaskManager\Symfony\Tests;
 
 use SunValley\TaskManager\Symfony\PhpTaskManagerBundle;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleDITaskDependencyInjector;
 use SunValley\TaskManager\TaskQueue\InMemoryTaskQueue;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -68,6 +69,10 @@ class TestKernel extends Kernel
                                       [$container->getDefinition('php_task_manager_loop')]
                                   )
                               );
+                    $container->register(SampleDITaskDependencyInjector::class, SampleDITaskDependencyInjector::class);
+
+                    $definition = $container->getDefinition(SampleDITaskDependencyInjector::class);
+                    $definition->setPublic(true); // if it's not public, the compilation eradicates this service
                 }
             }
         );

@@ -29,7 +29,7 @@ abstract class AbstractSymfonyTask extends AbstractTask
 
         if ($this->isPersistentTask()) {
             /** @noinspection PhpUndefinedMethodInspection */
-            $kernel = self::getPersistentKernel(); // this method is supposed to be provided by PersistentTaskTrait
+            $kernel = static::getPersistentKernel(); // this method is supposed to be provided by PersistentTaskTrait
         } else {
             $kernel = TaskEnvironment::generateKernelFromEnv();
         }

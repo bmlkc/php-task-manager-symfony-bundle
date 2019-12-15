@@ -5,8 +5,16 @@ namespace SunValley\TaskManager\Symfony\Tests;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use SunValley\TaskManager\Client;
+use SunValley\TaskManager\Exception\TaskOptionValidationException;
 use SunValley\TaskManager\ProgressReporter;
+use SunValley\TaskManager\Symfony\Task\TaskManagerFactory;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\NonPersistentTestTask;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\PersistentTestTask;
 use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleContainerAwareTask;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\SampleDITask;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\SamplePersistentContainerAwareTask;
+use SunValley\TaskManager\Symfony\Tests\Fixtures\SamplePersistentDITask;
+use SunValley\TaskManager\Task\AbstractTask;
 use SunValley\TaskManager\TaskStorage\RedisTaskStorage;
 use Symfony\Component\Yaml\Parser;
 
@@ -88,16 +96,74 @@ class PhpTaskManagerExtensionTest extends TestCase
         $this->buildContainer($config);
     }
 
-    public function testTaskEval()
+
+    /**
+     * @throws TaskOptionValidationException
+     */
+    public function testEvalContainerAwareTask()
+    {
+        $uniqid    = uniqid();
+        $task = new SampleContainerAwareTask($uniqid, ['data' => '543']);
+
+        $verifier = function($result) {
+            $this->assertEquals('Result: 543', $result);
+        };
+
+        $this->doTestEvalTask($task, $verifier);
+    }
+
+    /**
+     * @throws TaskOptionValidationException
+     */
+    public function testEvalDITask()
+    {
+        $uniqid    = uniqid();
+        $task = new SampleDITask($uniqid);
+
+        $verifier = function($result) {
+            $this->assertEquals('injected', $result);
+        };
+
+        $this->doTestEvalTask($task, $verifier);
+    }
+
+
+    /**
+     * @throws TaskOptionValidationException
+     */
+    public function testEvalPersistentTaskTwice()
+    {
+        $uniqid    = uniqid();
+        $task = new PersistentTestTask($uniqid);
+
+        $verifier = function($result) {
+            $this->assertEquals('hello', $result);
+        };
+
+        $id1 = $this->doTestEvalTask($task, $verifier);
+        $id2 = $this->doTestEvalTask($task, $verifier);
+    }
+
+
+    /**
+     * @param AbstractTask $task
+     * @param callable     $resultVerifier
+     *
+     * @return |null
+     */
+    private function doTestEvalTask(AbstractTask $task, Callable $resultVerifier)
     {
         $config    = $this->getFullConfig();
         $container = $this->buildContainer($config);
+
+        /** @var TaskManagerFactory $factory */
         $factory   = $container->get('php_task_manager_factory');
+
         $loop      = $factory->getLoop();
         $manager   = $factory->generate();
-        $uniqid    = uniqid();
+
         putenv('PTM_TEST_KERNEL_CONFIG=' . base64_encode(serialize(['php_task_manager' => $config])));
-        $promise = $manager->submitTask(new SampleContainerAwareTask($uniqid, ['data' => '543']));
+        $promise = $manager->submitTask($task);
         $result  = null;
         $error   = null;
         $promise->then(
@@ -121,8 +187,9 @@ class PhpTaskManagerExtensionTest extends TestCase
         $loop->run();
 
         $this->assertEmpty($error, $error);
-        $this->assertEquals('Result: 543', $result);
+        $result = $resultVerifier($result);
         putenv('PTM_TEST_KERNEL_CONFIG=');
+        return $result;
     }
 
     protected function buildContainer(array $config): ContainerInterface
