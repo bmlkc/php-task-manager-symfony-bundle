@@ -5,11 +5,11 @@ namespace SunValley\TaskManager\Symfony\Tests\Fixtures;
 
 
 use SunValley\TaskManager\ProgressReporter;
-use SunValley\TaskManager\Symfony\Task\AbstractSymfonyTask;
+use SunValley\TaskManager\Symfony\Task\AbstractSymfonyContainerAwareTask;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SampleTask extends AbstractSymfonyTask
+class SampleContainerAwareTask extends AbstractSymfonyContainerAwareTask
 {
 
     protected function __run(ProgressReporter $reporter, ContainerInterface $container)

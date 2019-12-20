@@ -4,7 +4,8 @@ namespace SunValley\TaskManager\Symfony\Doctrine;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use SunValley\TaskManager\ProgressReporter;
-use SunValley\TaskManager\Symfony\Task\AbstractPersistentSymfonyTask as BaseTask;
+use SunValley\TaskManager\Symfony\Task\AbstractSymfonyContainerAwareTask;
+use SunValley\TaskManager\Symfony\Task\PersistentTaskTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -69,8 +70,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @package SunValley\TaskManager\Symfony\Doctrine
  */
-class EntityRepositoryTask extends BaseTask
+class EntityRepositoryTask extends AbstractSymfonyContainerAwareTask
 {
+
+    use PersistentTaskTrait;
 
     /** @inheritDoc */
     protected function __run(ProgressReporter $reporter, ContainerInterface $container)
