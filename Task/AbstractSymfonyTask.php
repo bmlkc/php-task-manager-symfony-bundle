@@ -4,11 +4,19 @@ namespace SunValley\TaskManager\Symfony\Task;
 
 use SunValley\TaskManager\ProgressReporter;
 use SunValley\TaskManager\Task\AbstractTask;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class AbstractSymfonyTask defines a task that can be used with the framework. This task creates a Kernel each time a
- * task is run and destroys it at the end of the task.
+ * Class AbstractSymfonyTask defines a task that can be used with the framework.
+ *
+ * Depending on whether this task is "persistent" or not, this task might:
+ *
+ * 1) create a Kernel each time a task is run and destroy it at the end of this
+ *    particular task execution (non-persistent task).
+ * 2) create a kernel and never shut it down
+ *    in order to reuse it later (persistent task)
+ *
+ * a task class becomes "persistent" by using PersistentTaskTrait
  *
  * @package SunValley\TaskManager\Symfony\Task
  */
@@ -18,26 +26,33 @@ abstract class AbstractSymfonyTask extends AbstractTask
     /** @inheritDoc */
     final public function run(ProgressReporter $progressReporter): void
     {
-        
-        $kernel = TaskEnvironment::generateKernelFromEnv();
+
+        if ($this->isPersistentTask()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            $kernel = static::getPersistentKernel(); // this method is supposed to be provided by PersistentTaskTrait
+        } else {
+            $kernel = TaskEnvironment::generateKernelFromEnv();
+        }
+
         $kernel->boot();
-        $result = $this->__run($progressReporter, $kernel->getContainer());
+
+        $result = $this->runWithInitializedKernel($progressReporter, $kernel);
+
         if (!$progressReporter->isCompleted() && !$progressReporter->isFailed()) {
             $progressReporter->finishTask($result);
         }
-        
-        $kernel->shutdown();
+
+        if (!$this->isPersistentTask()) {
+            $kernel->shutdown();
+        }
     }
 
-    /**
-     * This method should not store anything from container to somewhere else to avoid memory leaks.
-     *
-     * @param ProgressReporter   $reporter
-     * @param ContainerInterface $container
-     *                                     
-     * @return mixed The return value will be set as result to this task
-     */
-    abstract protected function __run(ProgressReporter $reporter, ContainerInterface $container);
+    abstract protected function runWithInitializedKernel(ProgressReporter $progressReporter, Kernel $kernel);
+
+    final private function isPersistentTask(): bool
+    {
+        return method_exists(static::class, 'getPersistentKernel');
+    }
 
 
 }
