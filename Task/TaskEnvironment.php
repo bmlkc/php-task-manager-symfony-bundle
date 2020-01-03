@@ -56,7 +56,7 @@ class TaskEnvironment implements TaskEnvironmentInterface
      */
     public static function generateKernelFromEnv(): Kernel
     {
-        $kernelClass = $_ENV['PTM_SB_KERNEL_CLASS'] ?? $_SERVER['PTM_SB_KERNEL_CLASS'];
+        $kernelClass = $_ENV['PTM_SB_KERNEL_CLASS'] ?? $_SERVER['PTM_SB_KERNEL_CLASS'] ?? null;
         if (empty($kernelClass)) {
             throw new \RuntimeException('Unable to find required environmental variable PTM_SB_KERNEL_CLASS');
         }
@@ -65,16 +65,16 @@ class TaskEnvironment implements TaskEnvironmentInterface
             throw new \RuntimeException('Given class is not a Symfony Kernel class');
         }
 
-        $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS']?? null;
+        $kernelArgs = $_ENV['PTM_SB_KERNEL_ARGS'] ?? $_SERVER['PTM_SB_KERNEL_ARGS'] ?? null;
         $kernelArgs = unserialize(base64_decode($kernelArgs));
         if ($kernelArgs === null) {
             throw new \RuntimeException('Unable to find required environmental variables');
         }
 
-        $r      = new \ReflectionClass($kernelClass);
+        $r = new \ReflectionClass($kernelClass);
         /** @var Kernel $kernel */
         $kernel = $r->newInstanceArgs($kernelArgs);
-        
+
         return $kernel;
     }
 }
