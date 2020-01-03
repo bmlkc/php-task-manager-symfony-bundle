@@ -5,6 +5,7 @@ namespace SunValley\TaskManager\Symfony\Task;
 use React\EventLoop\LoopInterface;
 use SunValley\TaskManager\Configuration as PoolConfiguration;
 use SunValley\TaskManager\TaskManager;
+use SunValley\TaskManager\TaskManagerFactoryInterface;
 use SunValley\TaskManager\TaskQueueInterface;
 use SunValley\TaskManager\TaskStorageInterface;
 
@@ -14,7 +15,7 @@ use SunValley\TaskManager\TaskStorageInterface;
  *
  * @package SunValley\TaskManager\Symfony\Task
  */
-class TaskManagerFactory
+class TaskManagerFactory implements TaskManagerFactoryInterface
 {
 
     /** @var LoopInterface */
