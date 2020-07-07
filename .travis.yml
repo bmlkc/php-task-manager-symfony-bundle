@@ -3,6 +3,7 @@ language: php
 php:
     - 7.2
     - 7.3
+    - 7.4
 
 matrix:
     fast_finish: true
@@ -10,6 +11,8 @@ matrix:
         - php: 7.2
           env: DEPENDENCIES="symfony/framework-bundle:^3"
         - php: 7.3
+          env: DEPENDENCIES="symfony/framework-bundle:^3"
+        - php: 7.4
           env: DEPENDENCIES="symfony/framework-bundle:^3"
 
 sudo: false
