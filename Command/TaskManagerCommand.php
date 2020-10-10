@@ -32,5 +32,6 @@ class TaskManagerCommand extends Command
     {
         $manager = $this->managerFactory->generate();
         $this->managerFactory->getLoop()->run();
+        return 0;
     }
 }
